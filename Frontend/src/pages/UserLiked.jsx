@@ -39,7 +39,7 @@ const UserLiked = () => {
     <Container>
       <Navbar isScrolled={isScrolled}/>
       <div className='content flex column'>
-        <h1>My List</h1>
+        <h1>Bookmark</h1>
         <div className='grid flex'>
         {movies?.map((movie, index) => {
             return (

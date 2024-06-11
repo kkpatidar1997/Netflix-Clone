@@ -12,7 +12,7 @@ const Navbar = ({isScrolled}) => {
         {name: "Home", link: "/"},
         {name: "TV Shows", link: "/tv"},
         {name: "Movies", link: "/movies"},
-        {name: "My List", link: "/mylist"},
+        {name: "Bookmark", link: "/mylist"},
     ]
 
     const navigate = useNavigate()
