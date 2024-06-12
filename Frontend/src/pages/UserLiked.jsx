@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react'
+// 
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {  getUserLikedMovies } from '../store';
+import { getUserLikedMovies } from '../store';
 import { firebaseAuth } from '../utils/firebase-config';
 import { onAuthStateChanged } from 'firebase/auth';
 import styled from 'styled-components';
@@ -9,39 +10,50 @@ import Navbar from '../components/Navbar';
 import Card from '../components/Card';
 
 const UserLiked = () => {
-      
-  const navigate = useNavigate()
-  const [isScrolled, setIsScrolled] = useState(false)
+  const navigate = useNavigate();
+  const [isScrolled, setIsScrolled] = useState(false);
   const movies = useSelector((state) => state.netflix.movies);
   const dispatch = useDispatch();
-  const [email,setEmail] = useState(null);
-
-  onAuthStateChanged(firebaseAuth,(currentUser) => {
-    if(currentUser) setEmail(currentUser.email);
-    else navigate("/login");
-  })
-
+  const [email, setEmail] = useState(null);
 
   useEffect(() => {
-    console.log(email)
+    const unsubscribe = onAuthStateChanged(firebaseAuth, (currentUser) => {
+      if (currentUser) {
+        setEmail(currentUser.email);
+      } else {
+        navigate('/login');
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [navigate]);
+
+  useEffect(() => {
     if (email) {
       dispatch(getUserLikedMovies(email));
     }
-  }, [dispatch,email]);
+  }, [dispatch, email]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.pageYOffset !== 0);
+    };
 
-  window.onscroll = () => {
-    setIsScrolled(window.pageYOffset===0 ? false : true);
-    return () =>  (window.onscroll =null);
-  }
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   return (
     <Container>
-      <Navbar isScrolled={isScrolled}/>
+      <Navbar isScrolled={isScrolled} />
       <div className='content flex column'>
-        <h1>Bookmark</h1>
+        <h1>My List</h1>
         <div className='grid flex'>
-        {movies?.map((movie, index) => {
+          {movies?.map((movie, index) => {
             return (
               <Card
                 movieData={movie}
@@ -55,13 +67,12 @@ const UserLiked = () => {
       </div>
     </Container>
   );
-  
-}
+};
 
-export default UserLiked
+export default UserLiked;
 
 const Container = styled.div`
-.content {
+  .content {
     margin: 2.3rem;
     margin-top: 8rem;
     gap: 3rem;
